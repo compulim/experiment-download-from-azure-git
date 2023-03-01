@@ -1,0 +1,15 @@
+name: Download from Azure Git
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch: {}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://learn.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-7.1&tabs=HTTP
+      - run: |
+          curl GET https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.1-preview.1&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
