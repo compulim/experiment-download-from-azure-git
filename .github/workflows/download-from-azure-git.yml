@@ -1,10 +1,8 @@
 name: Download localization files
 
-# Controls when the workflow will run
 on:
   workflow_dispatch: {}
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   download:
     name: Download
@@ -43,7 +41,7 @@ jobs:
           if [ ! -z "$(git status --porcelain)" ];
           then
             echo has-changes=1 >> $GITHUB_OUTPUT
-            echo branch-name=loc-`date +"%s"` >> $GITHUB_OUTPUT
+            echo branch-name=loc-`date +"%Y%m%d-%H%M%S"` >> $GITHUB_OUTPUT
           else
             echo No new changes. >> $GITHUB_STEP_SUMMARY
           fi
@@ -63,7 +61,6 @@ jobs:
         if: ${{ steps.checks.outputs.has-changes }}
         name: Create pull request
         run: |
-          # gh pr create --assignee compulim --base main --fill --label area-localization --title "Localization sync"
           PULL_REQUEST_NUMBER=`gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.checks.outputs.branch-name }} --field title="Localization sync" | jq -r '.number'`
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=compulim
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/labels --field labels[]=area-localization
