@@ -12,7 +12,11 @@ jobs:
       # https://learn.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-7.1&tabs=HTTP
       - run: |
           mkdir localization-files/
-          curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o localization-files/en-US.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
+
+          for locale in ar-EG bg-BG ca-ES cs-CZ da-DK de-DE el-GR es-ES et-EE eu-ES fi-FI fr-FR gl-ES he-IL hi-IN hr-HR hu-HU id-ID it-IT ja-JP kk-KZ ko-KR lt-LT lv-LV ms-MY nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sk-SK sl-SI sr-Cyrl-CS sr-Latn-CS sv-SE th-TH tr-TR uk-UA vi-VN zh-CN zh-HK zh-TW
+          do
+            curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o localization-files/$locale.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Feature/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/$locale.json
+          done
 
       - uses: actions/upload-artifact@v3
         with:
