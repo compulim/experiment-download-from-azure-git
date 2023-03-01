@@ -1,4 +1,4 @@
-name: Sync from Azure Git
+name: Download localization files
 
 # Controls when the workflow will run
 on:
@@ -7,24 +7,33 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   sync:
-    name: Download from Azure Git
+    name: Download
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://learn.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-7.1&tabs=HTTP
+      - run: |
+          mkdir localization-files/
+          curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o localization-files/en-US.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: localization-files
+          path: localization-files/
+
+  sync:
+    name: Sync
     permissions:
       contents: write
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3.3.0
 
-      - name: Git config
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-
-      # https://learn.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-7.1&tabs=HTTP
-      - run: |
-          mkdir -p packages/api/src/localization/
-          curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o packages/api/src/localization/en-US.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
+      - uses: actions/download-artifact@v3
+        with:
+          name: localization-files
+          path: packages/api/src/localization
 
       - id: checks
         name: Check if contains new changes
@@ -37,17 +46,16 @@ jobs:
       - if: ${{ steps.checks.outputs.has-changes }}
         name: Create branch
         run: |
-          if [ ! -z "$(git status --porcelain)" ];
-          then
-            git checkout -b loc-`date +"%s"`
-            git add .
-            git commit --message="Localization sync"
-            git push --set-upstream origin HEAD
-          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b loc-`date +"%s"`
+          git add .
+          git commit --message="Localization sync"
+          git push --set-upstream origin HEAD
 
       - env:
           GH_TOKEN: ${{ secrets.CREATE_PR_TOKEN }}
         if: ${{ steps.checks.outputs.has-changes }}
         name: Create pull request
         run: |
-          gh pr create --assignee compulim --base main --label area-localization --title "Localization sync"
+          gh pr create --assignee compulim --base main --fill --label area-localization --title "Localization sync"
