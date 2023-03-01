@@ -21,8 +21,8 @@ jobs:
           name: localization-files
           path: localization-files/
 
-  sync:
-    name: Sync
+  create-pull-request:
+    name: Create pull request
     needs:
       - download
     permissions:
@@ -44,6 +44,8 @@ jobs:
           then
             echo has-changes=1 >> $GITHUB_OUTPUT
             echo branch-name=loc-`date +"%s"` >> $GITHUB_OUTPUT
+          else
+            echo ::notice::No new changes.
           fi
 
       - if: ${{ steps.checks.outputs.has-changes }}
@@ -65,3 +67,4 @@ jobs:
           PULL_REQUEST_NUMBER=`gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.checks.outputs.branch-name }} --field title="Localization sync" | jq -r '.number'`
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=compulim
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/labels --field labels[]=area-localization
+          echo ::notice::Pull request created at https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER.
