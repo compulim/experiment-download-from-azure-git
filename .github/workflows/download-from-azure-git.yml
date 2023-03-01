@@ -8,8 +8,7 @@ on:
 jobs:
   sync:
     permissions:
-      contents: read
-      pull-requests: write
+      contents: write
 
     runs-on: ubuntu-latest
 
@@ -26,7 +25,15 @@ jobs:
           mkdir -p packages/api/src/localization/
           curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o packages/api/src/localization/en-US.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
 
-      - name: Create pull request
+      - id: checks
+        name: Check if contains new changes
+        run: if [ ! -z "$(git status --porcelain)" ];
+          then
+          echo has-changes=1 >> $GITHUB_OUTPUT
+          fi
+
+      - if: ${{ steps.checks.outputs.has-changes }}
+        name: Create branch
         run: |
           if [ ! -z "$(git status --porcelain)" ];
           then
@@ -34,5 +41,11 @@ jobs:
             git add .
             git commit --message="Localization sync"
             git push --set-upstream origin HEAD
-            gh pr create --assignee compulim --base main --label area-localization --title "Localization sync"
           fi
+
+      - env:
+          GH_TOKEN: ${{ secrets.CREATE_PR_TOKEN }}
+        if: ${{ steps.checks.outputs.has-changes }}
+        name: Create pull request
+        run: |
+          gh pr create --assignee compulim --base main --label area-localization --title "Localization sync"
