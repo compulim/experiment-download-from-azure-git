@@ -7,6 +7,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   sync:
+    name: Download from Azure Git
     permissions:
       contents: write
 
@@ -27,9 +28,10 @@ jobs:
 
       - id: checks
         name: Check if contains new changes
-        run: if [ ! -z "$(git status --porcelain)" ];
+        run: |
+          if [ ! -z "$(git status --porcelain)" ];
           then
-          echo has-changes=1 >> $GITHUB_OUTPUT
+            echo has-changes=1 >> $GITHUB_OUTPUT
           fi
 
       - if: ${{ steps.checks.outputs.has-changes }}
