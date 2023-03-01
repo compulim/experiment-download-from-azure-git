@@ -8,12 +8,12 @@ on:
 jobs:
   download:
     permissions:
+      contents: read
       pull-requests: write
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v3.3.0
 
       # https://learn.microsoft.com/en-us/rest/api/azure/devops/git/items/get?view=azure-devops-rest-7.1&tabs=HTTP
       - run: |
