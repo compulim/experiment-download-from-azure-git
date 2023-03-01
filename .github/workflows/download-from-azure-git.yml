@@ -43,6 +43,7 @@ jobs:
           if [ ! -z "$(git status --porcelain)" ];
           then
             echo has-changes=1 >> $GITHUB_OUTPUT
+            echo branch-name=loc-`date +"%s"`
           fi
 
       - if: ${{ steps.checks.outputs.has-changes }}
@@ -50,7 +51,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -b loc-`date +"%s"`
+          git checkout -b ${{ steps.checks.outputs.branch-name }}
           git add .
           git commit --message="Localization sync"
           git push --set-upstream origin HEAD
@@ -60,4 +61,5 @@ jobs:
         if: ${{ steps.checks.outputs.has-changes }}
         name: Create pull request
         run: |
-          gh pr create --assignee compulim --base main --fill --label area-localization --title "Localization sync"
+          # gh pr create --assignee compulim --base main --fill --label area-localization --title "Localization sync"
+          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.checks.outputs.branch-name }} --field title="Localization sync"
