@@ -13,7 +13,7 @@ jobs:
       - run: |
           mkdir localization-files/
 
-          for locale in ar-EG bg-BG ca-ES cs-CZ da-DK de-DE el-GR es-ES et-EE eu-ES fi-FI fr-FR gl-ES he-IL hi-IN hr-HR hu-HU id-ID it-IT ja-JP kk-KZ ko-KR lt-LT lv-LV ms-MY nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sk-SK sl-SI sr-Cyrl-CS sr-Latn-CS sv-SE th-TH tr-TR uk-UA vi-VN zh-CN zh-HK zh-TW
+          for locale in ar-SA bg-BG ca-ES cs-CZ da-DK de-DE el-GR es-ES et-EE eu-ES fi-FI fr-FR gl-ES he-IL hi-IN hr-HR hu-HU id-ID it-IT ja-JP kk-KZ ko-KR lt-LT lv-LV ms-MY nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sk-SK sl-SI sr-Cyrl-CS sr-Latn-CS sv-SE th-TH tr-TR uk-UA vi-VN zh-CN zh-HK zh-TW
           do
             echo Downloading localization strings for "$locale".
             curl --fail --output localization-files/$locale.json --user ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Feature/CustomerCare_Apps/UI/$locale/BotFramework-WebChat/packages/api/src/Localization/$locale.json
