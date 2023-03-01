@@ -23,6 +23,8 @@ jobs:
 
   sync:
     name: Sync
+    needs:
+      - download
     permissions:
       contents: write
     runs-on: ubuntu-latest
