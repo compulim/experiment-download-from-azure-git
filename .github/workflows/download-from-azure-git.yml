@@ -21,7 +21,7 @@ jobs:
           curl -u ${{ secrets.ADO_USERNAME }}:${{ secrets.ADO_TOKEN }} -o packages/api/src/localization/en-US.json https://dev.azure.com/bagie/Production/_apis/git/repositories/D365_CE/items?api-version=7.0\&download=true\&path=/Latest/CustomerCare_Apps/UI/Master/BotFramework-WebChat/packages/api/src/Localization/en-US.json
 
       - run: |
-          if [ -z $(git status --porcelain) ];
+          if [ ! -z "$(git status --porcelain)" ];
           then
             git checkout -b loc-`date +"%s"`
             git commit -a -m "Localization sync"
